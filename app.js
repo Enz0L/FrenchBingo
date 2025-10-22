@@ -282,7 +282,7 @@ function initControls(){
   if (clearMarksBtn) clearMarksBtn.addEventListener('click', () => {
     state.hasBingo = false;
     state.isFullBoard = false;
-    const title = document.querySelector('#victoryTitle'); if (title) title.textContent = '🎉 GO !';
+    const title = document.querySelector('#victoryTitle'); if (title) title.textContent = '🎉 GO!';
     const p = victoryDialog.querySelector('p'); if (p) p.textContent = 'Bravo, fine lame du verbe ! Tu as complété une ligne.';
     document.querySelectorAll('.cell').forEach((cell, idx) => {
       state.grid[idx].marked = false;
