@@ -1,153 +1,68 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Bingo des expressions désuètes</title>
-    <style>
-        body {
-            font-family: 'Georgia', serif;
-            background-color: #fdf6e3;
-            text-align: center;
-            padding: 30px;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        #bingo {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .cell {
-            background-color: #eee8d5;
-            border: 1px solid #ccc;
-            padding: 15px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .cell:hover {
-            background-color: #d6d6d6;
-        }
-        .marked {
-            background-color: #b58900;
-            color: white;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #268bd2;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #005f87;
-        }
-        #info {
-            margin-top: 30px;
-            font-size: 1.1em;
-            color: #333;
-        }
-        #victory {
-            margin-top: 40px;
-            font-size: 1.5em;
-            color: #2aa198;
-            font-weight: bold;
-            animation: fadeIn 2s ease-in-out;
-            display: none;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bingo des Mots Oubliés</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Instrument+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <header class="app-header">
+    <h1 class="app-title">Bingo des <span>Mots Oubliés</span></h1>
+    <p class="app-tagline">Dès potron‑minet, la langue française reprend des couleurs.</p>
+  </header>
 
-    <h1>Bingo des expressions désuètes</h1>
-    <div id="bingo"></div>
-    <button onclick="genererBingo()">Recharger le bingo</button>
-    <div id="info">Cliquez sur une case pour la marquer.</div>
-    <div id="victory">🎉 Bravo tu es un fin limier de la langue française ! 🎉</div>
+  <main class="app-main">
+    <section class="controls" aria-label="Contrôles de la partie">
+      <div class="control-row">
+        <label for="boardSize">Grille</label>
+        <select id="boardSize" aria-label="Taille de la grille">
+          <option value="4">4 × 4</option>
+          <option value="5" selected>5 × 5</option>
+        </select>
 
-    <!-- Script confettis (canvas-confetti via CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+        <button id="newGameBtn" class="btn primary" type="button">Nouveau bingo</button>
+        <button id="clearMarksBtn" class="btn" type="button">Effacer</button>
+      </div>
+      <div class="control-row">
+        <label for="searchInput">Recherche</label>
+        <input id="searchInput" type="search" placeholder="Rechercher une expression…" aria-label="Rechercher une expression">
+        <button id="shuffleBtn" class="btn" type="button" title="Remélanger les expressions affichées">Remélanger</button>
+      </div>
+    </section>
 
-    <script>
-        const expressions_desuetes = [
-            "De Charybde en Scylla", "Gros-Jean comme devant", "Jeter sa gourme", "Le torchon brûle",
-            "Mettre la viande dans le torchon", "Battre la breloque", "Aller à vau-l’eau", "Faire la lippe",
-            "Avoir les jambes en coton", "Mettre les bouts", "Être dans les choux", "Faire la sainte nitouche",
-            "Avoir le béguin", "Être fleur bleue", "Faire fi de quelque chose", "Avoir voix au chapitre",
-            "Tirer le diable par la queue", "Être aux abois", "Être sur son trente-et-un", "Avoir les dents longues",
-            "Faire des gorges chaudes", "Avoir la tête près du bonnet", "Être un panier percé",
-            "Faire des pieds et des mains", "Avoir la berlue", "Être dans de beaux draps", "Faire chou blanc",
-            "Avoir la main leste", "Être un oiseau de mauvais augure"
-        ];
+    <section class="board" aria-live="polite" aria-label="Grille du bingo">
+      <div id="bingoGrid" class="grid" role="grid"></div>
+    </section>
 
-        function genererBingo() {
-            const bingo = document.getElementById("bingo");
-            bingo.innerHTML = "";
-            document.getElementById("victory").style.display = "none";
+    <section class="drawer" id="drawer" aria-label="Liste des expressions">
+      <header class="drawer__header">
+        <h2>Les 100 expressions</h2>
+        <small id="countInfo"></small>
+      </header>
+      <div id="expressionList" class="drawer__content" role="list"></div>
+    </section>
+  </main>
 
-            const expressionsMelangees = [...expressions_desuetes]
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 16); // 4x4
+  <dialog id="victoryDialog" class="modal" aria-labelledby="victoryTitle">
+    <div class="modal__content">
+      <h2 id="victoryTitle">🎉 Bingo !</h2>
+      <p>Bravo, fine lame du verbe ! Continues ainsi!</p>
+      <div class="modal__actions">
+        <button id="closeDialogBtn" class="btn" type="button">Fermer</button>
+        <button id="playAgainBtn" class="btn primary" type="button">Rejouer</button>
+      </div>
+    </div>
+  </dialog>
 
-            expressionsMelangees.forEach(expr => {
-                const cell = document.createElement("div");
-                cell.className = "cell";
-                cell.textContent = expr;
-                cell.onclick = () => {
-                    cell.classList.toggle("marked");
-                    document.getElementById("info").textContent = `Vous avez sélectionné : "${expr}"`;
-                    verifierVictoire();
-                };
-                bingo.appendChild(cell);
-            });
+  <footer class="app-footer">
+    <p>© 2025 — Bingo des Mots Oubliés • Enzo LE NAIR<a href="#" id="toggleTheme">Mode sombre</a></p>
+  </footer>
 
-            document.getElementById("info").textContent = "Cliquez sur une case pour la marquer.";
-        }
-
-        function verifierVictoire() {
-            const toutesLesCases = document.querySelectorAll(".cell");
-            const toutesMarquees = Array.from(toutesLesCases).every(cell => cell.classList.contains("marked"));
-            if (toutesMarquees) {
-                document.getElementById("victory").style.display = "block";
-                lancerConfettis();
-            }
-        }
-
-        function lancerConfettis() {
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
-
-            (function frame() {
-                confetti({
-                    particleCount: 5,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 }
-                });
-                confetti({
-                    particleCount: 5,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 }
-                });
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
-            })();
-        }
-
-        window.onload = genererBingo;
-    </script>
-
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="app.js" type="module"></script>
 </body>
 </html>
