@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bingo des expressions désuètes</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #fdf6e3;
+            text-align: center;
+            padding: 30px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #bingo {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .cell {
+            background-color: #eee8d5;
+            border: 1px solid #ccc;
+            padding: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cell:hover {
+            background-color: #d6d6d6;
+        }
+        .marked {
+            background-color: #b58900;
+            color: white;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #268bd2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #005f87;
+        }
+        #info {
+            margin-top: 30px;
+            font-size: 1.1em;
+            color: #333;
+        }
+        #victory {
+            margin-top: 40px;
+            font-size: 1.5em;
+            color: #2aa198;
+            font-weight: bold;
+            animation: fadeIn 2s ease-in-out;
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bingo des expressions désuètes</h1>
+    <div id="bingo"></div>
+    <button onclick="genererBingo()">Recharger le bingo</button>
+    <div id="info">Cliquez sur une case pour la marquer.</div>
+    <div id="victory">🎉 Bravo tu es un fin limier de la langue française ! 🎉</div>
+
+    <!-- Script confettis (canvas-confetti via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <script>
+        const expressions_desuetes = [
+            "De Charybde en Scylla", "Gros-Jean comme devant", "Jeter sa gourme", "Le torchon brûle",
+            "Mettre la viande dans le torchon", "Battre la breloque", "Aller à vau-l’eau", "Faire la lippe",
+            "Avoir les jambes en coton", "Mettre les bouts", "Être dans les choux", "Faire la sainte nitouche",
+            "Avoir le béguin", "Être fleur bleue", "Faire fi de quelque chose", "Avoir voix au chapitre",
+            "Tirer le diable par la queue", "Être aux abois", "Être sur son trente-et-un", "Avoir les dents longues",
+            "Faire des gorges chaudes", "Avoir la tête près du bonnet", "Être un panier percé",
+            "Faire des pieds et des mains", "Avoir la berlue", "Être dans de beaux draps", "Faire chou blanc",
+            "Avoir la main leste", "Être un oiseau de mauvais augure"
+        ];
+
+        function genererBingo() {
+            const bingo = document.getElementById("bingo");
+            bingo.innerHTML = "";
+            document.getElementById("victory").style.display = "none";
+
+            const expressionsMelangees = [...expressions_desuetes]
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 16); // 4x4
+
+            expressionsMelangees.forEach(expr => {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                cell.textContent = expr;
+                cell.onclick = () => {
+                    cell.classList.toggle("marked");
+                    document.getElementById("info").textContent = `Vous avez sélectionné : "${expr}"`;
+                    verifierVictoire();
+                };
+                bingo.appendChild(cell);
+            });
+
+            document.getElementById("info").textContent = "Cliquez sur une case pour la marquer.";
+        }
+
+        function verifierVictoire() {
+            const toutesLesCases = document.querySelectorAll(".cell");
+            const toutesMarquees = Array.from(toutesLesCases).every(cell => cell.classList.contains("marked"));
+            if (toutesMarquees) {
+                document.getElementById("victory").style.display = "block";
+                lancerConfettis();
+            }
+        }
+
+        function lancerConfettis() {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+
+        window.onload = genererBingo;
+    </script>
+
+</body>
+</html>
