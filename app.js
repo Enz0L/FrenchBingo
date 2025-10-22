@@ -35,7 +35,6 @@ const RAW_EXPRESSIONS = [
   "Crier haro sur",
   "Mettre aux arrêts",
   "Être marrie/marri",
-  "Être marri de",
   "Dépourvu de tout charroi",
   "Dépouiller l’anguille",
   "Porter la férule",
@@ -291,3 +290,9 @@ function initControls(){
 // Boot
 initControls();
 buildGrid();
+
+
+// Initialisation automatique au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+  buildGrid();
+});
