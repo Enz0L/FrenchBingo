@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   "Bougre !",
   "Que diable !",
   "Peste !",
-  "Ma foi !
+  "Ma foi !"
 ]
 
   // --- Utils ---
